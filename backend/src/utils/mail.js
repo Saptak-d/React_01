@@ -22,8 +22,8 @@ let mailGenerator = new Mailgen({
 
 const sendmail = async function(options){
     
- let  emailText = mailGenerator.generatePlaintext(options.verificationEmail);
- let emailHtml = mailGenerator.generate(options.verificationEmail);
+ let  emailText = mailGenerator.generatePlaintext(options.mailGenContent);
+ let emailHtml = mailGenerator.generate(options.mailGenContent);
   const mail = {
      from: 'mail.taskmanager@example.com',
     to:options.email,

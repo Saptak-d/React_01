@@ -12,9 +12,7 @@ cloudinary.config({
 const uploadCloudinary = async(localFilepath)=>{
       const fixedPath = localFilepath.replace(/\\/g, "/")
     try {
-        if(!localFilepath){
-            throw new ApiError(500,"the image path is not found")
-        }
+        if(!localFilepath)return null
         const response = await cloudinary.uploader.upload(fixedPath,{
             resource_type : "auto",
             folder: "task_attachments",
