@@ -39,8 +39,6 @@ const sendmail = async function(options){
 
 }
 
-
-
 const verificationEmail = (username ,verificationURL) => {
     return {
          body: {
