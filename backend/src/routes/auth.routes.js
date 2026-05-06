@@ -9,5 +9,7 @@ router.route("/register")
     .post(upload.single("avatar"),
      registerValidator(),
      validator,
-     registerUser
+     registerUser,
 )
+
+ export default router;

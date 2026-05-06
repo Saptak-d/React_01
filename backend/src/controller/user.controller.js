@@ -12,7 +12,7 @@ const registerUser = asyncHandler(async(req,res,next)=>{
    const existUser = await User.findOne({
       $or : [{email},{username}]
    })
-   if(!existUser){
+   if(existUser){
     throw new ApiError(409,"the user is already exist")
    }
    let avatarCloudLink ; 
@@ -25,7 +25,7 @@ const registerUser = asyncHandler(async(req,res,next)=>{
        }
    }
 
-   const user = User.create({
+   const user = await User.create({
      fullname,
      email,
      username,
@@ -36,11 +36,12 @@ const registerUser = asyncHandler(async(req,res,next)=>{
      },
      isEmailVerified: false,
    });
+ 
 
-  const {hashedToken , unHashedToken , tokenExpiry} = user.generateTemporaryToken();
+  const {unhashedToken, hashToken , tokenExpiary} = user.generateTemporaryToken();
 
-  user.emailVerificationToken = hashedToken;
-  user.emailVerificationExpiry = tokenExpiry;
+  user.emailVerificationToken = hashToken;
+  user.emailVerificationExpiry = tokenExpiary;
 
   await user.save({validateBeforesave : false });
 
@@ -49,7 +50,7 @@ const registerUser = asyncHandler(async(req,res,next)=>{
     await sendmail({
         email : user?.email,
         subject : "please verify your email",
-        mailGenContent : verificationEmail(user.username, `${req.protocol}://${req.get("host")}/api/v1/auth/verify-email/${unHashedToken}`)
+        mailGenContent : verificationEmail(user.username, `${req.protocol}://${req.get("host")}/api/v1/auth/verify-email/${unhashedToken}`)
     })}
      catch (error) {
     await User.findByIdAndDelete(user._id);
@@ -66,6 +67,7 @@ const registerUser = asyncHandler(async(req,res,next)=>{
 })
 
 export{registerUser, 
+
     
 }
 

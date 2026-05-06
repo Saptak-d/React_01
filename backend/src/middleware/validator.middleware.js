@@ -9,7 +9,6 @@ import fs from "fs/promises";
   if(errors.isEmpty()){
             return next()
          }
-
    const  extractedError = errors.array().map(err =>({
      [err.path] : err.msg
    }));

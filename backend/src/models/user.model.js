@@ -1,6 +1,7 @@
 import mongoose, { Schema }  from "mongoose";
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
+import crypto from "crypto"
 
 const userSchema = new Schema({
    avatar : {
@@ -25,8 +26,8 @@ const userSchema = new Schema({
     unique : true ,
     trim : true,
   },
-  fullName : {
-    type : string ,
+  fullname : {
+    type : String ,
     required : true ,
     trim : true,
   },
@@ -57,10 +58,10 @@ const userSchema = new Schema({
 
 userSchema.pre("save", async function (next) {
    if(!this.isModified("password")){
-      return next()
+      return 
    }
    this.password = await bcrypt.hash(this.password, 10);
-   next();
+  
 });
 
 userSchema.methods.ispasswordCorrect = async function (password) {
@@ -91,7 +92,9 @@ userSchema.methods.generateRefereshToken = function(){
 userSchema.methods.generateTemporaryToken = function(){
   const unhashedToken = crypto.randomBytes(20).toString("hex");
   const hashToken = crypto.createHash("sha256").update(unhashedToken).digest("hex");
-  const tokenExpiary = Date().now() + (20 * 60 * 1000)
+  const tokenExpiary = Date.now() + (20 * 60 * 1000)
   return {unhashedToken, hashToken , tokenExpiary}
 }
+
+
 export const  User = mongoose.model("User",userSchema);
