@@ -36,8 +36,24 @@ const verifyEmailValidator  = ()=>{
   ]
 }
 
+const loginUserValidator = () =>{
+  return [
+    body("email").trim()
+     .notEmpty().withMessage("the Email is required")
+     .isEmail().withMessage("invalid email"),
+
+     body("username").trim()
+      .notEmpty().withMessage("the username is required"),
+
+    body("password").trim()
+      .notEmpty().withMessage("the password is required")
+  ]
+}
+
 
 export{
     registerValidator,
-    verifyEmailValidator
+    verifyEmailValidator,
+    loginUserValidator
+
 }
