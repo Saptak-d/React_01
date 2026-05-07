@@ -4,7 +4,7 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 import {APiResponse} from "../utils/api-response.js"
 import {uploadCloudinary,deleteOnCloudinary} from "../utils/cloudinary.js"
 import { sendmail ,verificationEmail} from "../utils/mail.js";
-import { use } from "react";
+import crypto from "crypto"
 
 const registerUser = asyncHandler(async(req,res)=>{
    const{email,username,password, fullname} = req.body 
@@ -69,10 +69,12 @@ const registerUser = asyncHandler(async(req,res)=>{
 
 const verifyEmail = asyncHandler(async(req,res)=>{
   const {verificationToken} = req.params;
-  if(!verificationEmail){
+   console.log("the data is",verificationToken)
+      console.log("the data type", typeof verificationToken)
+  if(!verificationToken){
     throw new ApiError(400,"Email Verification token is missing")
   }
-  const hashToken = crypto.createHash("sha256").update(verificationEmail).digest("hex")
+  const hashToken = crypto.createHash("sha256").update(verificationToken).digest("hex")
   const user = await User.findOne({emailVerificationToken : hashToken ,emailVerificationExpiry : {$gt : Date.now()}});
 
   if(!user){
@@ -92,7 +94,7 @@ const verifyEmail = asyncHandler(async(req,res)=>{
 export{
   registerUser, 
   verifyEmail,
-  
+
 
     
 }
