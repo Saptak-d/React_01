@@ -5,7 +5,18 @@ import {APiResponse} from "../utils/api-response.js"
 import {uploadCloudinary,deleteOnCloudinary} from "../utils/cloudinary.js"
 import { sendmail ,verificationEmail} from "../utils/mail.js";
 import crypto from "crypto"
-
+const generateAccessAndRefreshTokens = async(userId)=>{
+  try {
+    const user = await User.findById(userId)
+     const accessToken = user.generateAccessToken();
+     const refreshToken = user.generateRefereshToken();
+     user.refreshToken = refreshToken ;
+     await user.save({validateBeforeSave : false});
+      return {accessToken , refreshToken}
+  } catch (error) {
+     throw new ApiError(500,"something went wrong while generating the access token")
+  }
+}
 const registerUser = asyncHandler(async(req,res)=>{
    const{email,username,password, fullname} = req.body 
    const imageLocalPath  = req.file?.path;
@@ -38,7 +49,6 @@ const registerUser = asyncHandler(async(req,res)=>{
      isEmailVerified: false,
    });
  
-
   const {unhashedToken, hashToken , tokenExpiary} = user.generateTemporaryToken();
 
   user.emailVerificationToken = hashToken;
@@ -46,7 +56,6 @@ const registerUser = asyncHandler(async(req,res)=>{
 
   await user.save({validateBeforesave : false });
 
- 
   try {
     await sendmail({
         email : user?.email,
@@ -89,7 +98,9 @@ const verifyEmail = asyncHandler(async(req,res)=>{
    return res
     .status(200)
     .json(new APiResponse(200, {isEmailVerified : true} ,"The Email is verified"))
-})
+});
+
+
 
 export{
   registerUser, 

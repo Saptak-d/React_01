@@ -35,6 +35,8 @@ const verifyEmailValidator  = ()=>{
      .isLength(20).withMessage("Invalid Token")
   ]
 }
+
+
 export{
     registerValidator,
     verifyEmailValidator
