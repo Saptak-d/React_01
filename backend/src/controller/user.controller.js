@@ -4,8 +4,9 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 import {APiResponse} from "../utils/api-response.js"
 import {uploadCloudinary,deleteOnCloudinary} from "../utils/cloudinary.js"
 import { sendmail ,verificationEmail} from "../utils/mail.js";
+import { use } from "react";
 
-const registerUser = asyncHandler(async(req,res,next)=>{
+const registerUser = asyncHandler(async(req,res)=>{
    const{email,username,password, fullname} = req.body 
    const imageLocalPath  = req.file?.path;
 
@@ -66,7 +67,31 @@ const registerUser = asyncHandler(async(req,res,next)=>{
   )
 })
 
-export{registerUser, 
+const verifyEmail = asyncHandler(async(req,res)=>{
+  const {verificationToken} = req.params;
+  if(!verificationEmail){
+    throw new ApiError(400,"Email Verification token is missing")
+  }
+  const hashToken = crypto.createHash("sha256").update(verificationEmail).digest("hex")
+  const user = await User.findOne({emailVerificationToken : hashToken ,emailVerificationExpiry : {$gt : Date.now()}});
+
+  if(!user){
+    throw new ApiError(400,"token is expaired or not found")
+  }
+  user.isEmailVerified = true ;
+  user.emailVerificationExpiry = undefined ;
+  user.emailVerificationToken = undefined ;
+
+  await user.save({validateBeforeSave : false});
+
+   return res
+    .status(200)
+    .json(new APiResponse(200, {isEmailVerified : true} ,"The Email is verified"))
+})
+
+export{
+  registerUser, 
+  verifyEmail
 
     
 }
