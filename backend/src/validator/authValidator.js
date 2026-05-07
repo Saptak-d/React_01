@@ -26,7 +26,16 @@ const registerValidator = () => {
       .isLength({ max: 13 }).withMessage("Password can't exceed 13 characters"),
  ]
 }
+
+const verifyEmailValidator  = ()=>{
+  return [
+    param("verificationToken")
+     .trim()
+     .notEmpty().withMessage("the verification token is required")
+     .isLength(20).withMessage("Invalid Token")
+  ]
+}
 export{
     registerValidator,
-
+    verifyEmailValidator
 }

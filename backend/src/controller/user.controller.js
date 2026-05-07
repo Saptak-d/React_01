@@ -91,7 +91,8 @@ const verifyEmail = asyncHandler(async(req,res)=>{
 
 export{
   registerUser, 
-  verifyEmail
+  verifyEmail,
+  
 
     
 }
