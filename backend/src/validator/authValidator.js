@@ -38,13 +38,12 @@ const verifyEmailValidator  = ()=>{
 
 const loginUserValidator = () =>{
   return [
-    body("email").trim()
-     .notEmpty().withMessage("the Email is required")
-     .isEmail().withMessage("invalid email"),
-
-     body("username").trim()
-      .notEmpty().withMessage("the username is required"),
-
+     body("email").custom((value,{req})=>{
+        if(!req.body.email && !req.body.username){
+          throw new Error("email or username is required")
+        }
+        return true
+     }),
     body("password").trim()
       .notEmpty().withMessage("the password is required")
   ]
