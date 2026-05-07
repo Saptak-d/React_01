@@ -100,11 +100,45 @@ const verifyEmail = asyncHandler(async(req,res)=>{
     .json(new APiResponse(200, {isEmailVerified : true} ,"The Email is verified"))
 });
 
+const loginUser = asyncHandler(async(req,res)=>{
+  const {email,password,username} = req.body ;
 
+  const user  = await User.findOne({$or :[{email},{username}]});
+
+  if(!user){
+    throw new ApiError(404,"user not found")
+  }
+  
+  const isPasswordValid = user.isPasswordValid(user.password);
+  if(!isPasswordValid){
+    throw new ApiError(401,"INVALID PASSWORD")
+  }
+  if(!user.isEmailVerified){
+    throw new ApiError(401,"User Email is not Verified please Verify Your Email Fist")
+  }
+
+  const {accessToken , refreshToken} =  await generateAccessAndRefreshTokens(user._id)
+  
+   const loggedinUser  = await User.findById(user._id).select("-password -refreshToken -emailVerification -emailVerificationExpiry");
+
+   const options = {
+    httpOnly : true ,
+    secure: process.env.NODE_ENV === "production"
+   }
+   return res 
+    .status(200)
+    .cookie("accessToken",accessToken,options)
+    .cookie("refreshToken",refreshToken,options)
+    .json(
+      new APiResponse(200,loggedinUser,"user is  login successfully")
+    )
+})
 
 export{
   registerUser, 
   verifyEmail,
+  loginUser,
+
 
 
     
